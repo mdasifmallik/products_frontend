@@ -27,6 +27,11 @@ const routes = [
     component: () => import('../views/auth/Login.vue')
   },
   {
+    path: '/register',
+    name: 'Register',
+    component: () => import('../views/auth/Register.vue')
+  },
+  {
     path: '/*',
     redirect: '/'
   }
@@ -38,9 +43,11 @@ const router = new VueRouter({
   routes
 })
 
+// Navigation Guard
 router.beforeEach((to, from, next) => {
   if (to.name === "Login" || to.name === "Register") {
-    if (user.hasToken()) {
+    // Redirect to Home if there is valid token
+    if (user.hasValidToken()) {
       next({
         name: "Home",
       });
@@ -48,12 +55,24 @@ router.beforeEach((to, from, next) => {
       next();
     }
   } else {
-    if (!user.hasToken()) {
+    // Redirect to Login page if there is no valid token
+    if (user.hasValidToken()) {
+      // Refresh Token if it's more than 15 minutes old
+      user.refreshToken().then((result) => {
+        if (result) {
+          next();
+        } else {
+          user.logout();
+          next({
+            name: "Login",
+          });
+        }
+      });
+    } else {
+      user.logout();
       next({
         name: "Login",
       });
-    } else {
-      next();
     }
   }
 });

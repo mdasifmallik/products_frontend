@@ -4,9 +4,22 @@
       <div class="col-md-3"></div>
       <div class="col-md-6">
         <div class="card text-white bg-dark mb-3 mt-5">
-          <h4 class="card-header text-center">Sign In</h4>
+          <h4 class="card-header text-center">Sign Up</h4>
           <div class="card-body">
-            <form @submit.prevent="login">
+            <form @submit.prevent="register">
+              <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="name"
+                  placeholder="Full Name"
+                  v-model="form.name"
+                />
+                <span class="text-danger" v-if="errors.name">{{
+                  errors.name[0]
+                }}</span>
+              </div>
               <div class="mb-3">
                 <label class="form-label">Email address</label>
                 <input
@@ -34,14 +47,24 @@
                 }}</span>
               </div>
               <div class="mb-3">
+                <label class="form-label">Retype Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  name="password_confirmation"
+                  placeholder="Password"
+                  v-model="form.password_confirmation"
+                />
+              </div>
+              <div class="mb-3">
                 <label
                   class="form-label"
                   style="text-align: right; display: block"
-                  >Don't have an account?
-                  <router-link to="/register">Sign Up</router-link></label
+                  >Already have an account?
+                  <router-link to="/login">Sign In</router-link></label
                 >
               </div>
-              <button type="submit" class="btn btn-primary">Login</button>
+              <button type="submit" class="btn btn-primary">Register</button>
             </form>
           </div>
         </div>
@@ -59,21 +82,23 @@ export default {
   data() {
     return {
       form: {
+        name: null,
         email: null,
         password: null,
+        password_confirmation: null,
       },
       errors: {},
     };
   },
   methods: {
-    login() {
+    register() {
       axios
-        .post(this.url.make("api/auth/login"), this.form)
+        .post(this.url.make("api/auth/register"), this.form)
         .then((response) => {
           this.user.responseAfterLogin(response);
           this.Toast.fire({
             icon: "success",
-            title: "Signed in successfully!",
+            title: "Registered successfully!",
           });
           this.$router.push("/");
         })

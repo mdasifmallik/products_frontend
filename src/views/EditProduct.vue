@@ -96,25 +96,7 @@ export default {
     };
   },
   created() {
-    this.user.loginCheck().then((result) => {
-      if (!result) {
-        this.user.logout();
-        this.$router.push("/login");
-      }
-    });
-
-    this.axios
-      .get(this.url.make("api/products/" + this.$route.params.id), {
-        headers: {
-          Authorization: this.user.authToken(),
-        },
-      })
-      .then((result) => {
-        this.form = result.data;
-      })
-      .catch((error) => {
-        console.log(error.response.data);
-      });
+    this.getProduct();
   },
   methods: {
     selectPhoto() {
@@ -129,6 +111,20 @@ export default {
 
       reader.readAsDataURL(this.$refs.product_photo.files[0]);
     },
+    getProduct() {
+      this.axios
+        .get(this.url.make("api/products/" + this.$route.params.id), {
+          headers: {
+            Authorization: this.user.authToken(),
+          },
+        })
+        .then((result) => {
+          this.form = result.data;
+        })
+        .catch((error) => {
+          console.log(error.response.data);
+        });
+    },
     updateProduct() {
       // Making of the form
       let formData = new FormData();
@@ -139,8 +135,6 @@ export default {
       if (this.photoPreview) {
         formData.append("image", this.$refs.product_photo.files[0]);
       }
-
-      console.log(formData);
 
       // Posting form
       this.axios
@@ -163,7 +157,7 @@ export default {
         .catch((error) => {
           this.Toast.fire({
             icon: "error",
-            title: "Error!",
+            title: error.response.data.message,
           });
           this.errors = error.response.data.errors;
         });

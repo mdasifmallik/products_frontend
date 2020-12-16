@@ -21,7 +21,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(product, index) in products" :key="product.id">
+            <tr v-for="(product, index) in products.data" :key="product.id">
               <th scope="row">{{ index + 1 }}</th>
               <td>
                 <img
@@ -50,7 +50,7 @@
                 </div>
               </td>
             </tr>
-            <tr v-if="products && products.length == 0">
+            <tr v-if="!loading && products.data.length == 0">
               <td colspan="50" class="text-danger text-center">
                 No Products Available!
               </td>
@@ -68,6 +68,15 @@
                 </div>
               </td>
             </tr>
+            <tr>
+              <td colspan="50">
+                <pagination
+                  :data="products"
+                  @pagination-change-page="getResults"
+                  class="d-flex justify-content-center"
+                ></pagination>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -81,32 +90,14 @@ import axios from "axios";
 export default {
   data() {
     return {
-      products: null,
+      products: {
+        data: [],
+      },
       loading: true,
     };
   },
   created() {
-    this.user.loginCheck().then((result) => {
-      if (!result) {
-        this.user.logout();
-        this.$router.push("/login");
-      }
-    });
-
-    axios
-      .get(this.url.make("api/products"), {
-        headers: {
-          Authorization: this.user.authToken(),
-        },
-      })
-      .then((result) => {
-        this.products = result.data;
-        this.loading = false;
-      })
-      .catch((errors) => {
-        console.log(errors.response.data);
-        this.loading = false;
-      });
+    this.getResults();
   },
   methods: {
     deleteProduct(index) {
@@ -119,8 +110,7 @@ export default {
         confirmButtonColor: "#F1556C",
       }).then((result) => {
         if (result.isConfirmed) {
-          let id = this.products[index].id;
-          this.products.splice(index, 1);
+          let id = this.products.data[index].id;
 
           axios
             .delete(this.url.make("api/products/" + id), {
@@ -128,14 +118,26 @@ export default {
                 Authorization: this.user.authToken(),
               },
             })
-            .then((result) => {
-              console.log(result);
+            .then(() => {
+              this.getResults();
             })
             .catch((error) => {
               console.log(error.response.data);
             });
         }
       });
+    },
+    getResults(page = 1) {
+      axios
+        .get(this.url.make("api/products?page=" + page), {
+          headers: {
+            Authorization: this.user.authToken(),
+          },
+        })
+        .then((result) => {
+          this.products = result.data;
+          this.loading = false;
+        });
     },
   },
 };

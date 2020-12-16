@@ -2,7 +2,7 @@
   <div id="app">
     <nav
       class="navbar navbar-expand-lg navbar-dark bg-dark"
-      v-if="user.hasToken()"
+      v-if="user.hasValidToken()"
     >
       <div class="container">
         <router-link class="navbar-brand" to="/">Products</router-link>
@@ -53,11 +53,6 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-lg-end dropdown-menu-dark">
               <li>
-                <button class="dropdown-item" type="button">
-                  Edit Profile
-                </button>
-              </li>
-              <li>
                 <button class="dropdown-item" type="button" @click="logout">
                   Log Out
                 </button>
@@ -78,8 +73,24 @@
 export default {
   methods: {
     logout() {
-      this.user.logout();
-      this.$router.push("/login");
+      this.axios
+        .post(
+          this.url.make("api/auth/logout"),
+          {},
+          {
+            headers: {
+              Authorization: this.user.authToken(),
+            },
+          }
+        )
+        .then(() => {
+          this.user.logout();
+          this.$router.push("/login");
+        })
+        .catch(() => {
+          this.user.logout();
+          this.$router.push("/login");
+        });
     },
   },
 };

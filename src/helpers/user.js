@@ -13,18 +13,50 @@ const user = {
         }
     },
 
-    hasToken() {
+    // Check if token stored and it's valid
+    hasValidToken() {
         const storedToken = appStorage.getToken();
         if (storedToken) {
-            return token.isValid(storedToken) ? true : false
+            if (token.isValid(storedToken)) {
+                return token.tokenExpired(storedToken) ? false : true
+            }
         }
         return false
+    },
+
+    // Refresh token if it's need to be and return true if everything is ok 
+    async refreshToken() {
+        let bool = false;
+        
+        if (this.hasValidToken()) {
+            bool = true;
+            if (token.tokenNeedsRefresh(appStorage.getToken())) {
+                await axios
+                    .post(
+                        url.make("api/auth/refresh"), {}, {
+                            headers: {
+                                Authorization: this.authToken(),
+                            },
+                        }
+                    )
+                    .then((result) => {
+                        this.responseAfterLogin(result);
+                        bool = true;
+                    })
+                    .catch((error) => {
+                        console.log(error.response.data);
+                        bool = false;
+                    })
+            }
+        }
+
+        return bool;
     },
 
     authToken() {
         const token = appStorage.getToken();
 
-        if (this.hasToken(token)) {
+        if (this.hasValidToken(token)) {
             return "Bearer" + token;
         } else {
             return null;
@@ -32,28 +64,9 @@ const user = {
     },
 
     name() {
-        if (this.hasToken()) {
+        if (this.hasValidToken()) {
             return appStorage.getUser()
         }
-    },
-
-    async loginCheck() {
-        let bool = false;
-        await axios
-            .get(
-                url.make("api/auth/loginCheck"), {
-                    headers: {
-                        Authorization: this.authToken(),
-                    },
-                }
-            )
-            .then(() => {
-                bool = true;
-            })
-            .catch(() => {
-                bool = false;
-            })
-        return bool;
     },
 
     logout() {

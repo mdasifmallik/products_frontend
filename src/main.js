@@ -12,6 +12,9 @@ Vue.config.productionTip = false
 // Axios
 Vue.use(VueAxios, axios)
 
+// Laravel Pagination
+Vue.component('pagination', require('laravel-vue-pagination'));
+
 // SweetAlert Toast
 const Toast = Swal.mixin({
   toast: true,

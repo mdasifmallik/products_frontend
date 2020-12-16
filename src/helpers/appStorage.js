@@ -1,11 +1,11 @@
 const appStorage = {
     store(token, user) {
-        localStorage.setItem('token', token);
+        localStorage.setItem('token_4692', token);
         localStorage.setItem('user', user);
     },
 
     getToken() {
-        return localStorage.getItem('token');
+        return localStorage.getItem('token_4692');
     },
 
     getUser() {
@@ -13,7 +13,7 @@ const appStorage = {
     },
 
     clear() {
-        localStorage.removeItem('token');
+        localStorage.removeItem('token_4692');
         localStorage.removeItem('user');
     },
 }

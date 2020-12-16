@@ -96,14 +96,6 @@ export default {
       photoPreview: null,
     };
   },
-  created() {
-    this.user.loginCheck().then((result) => {
-      if (!result) {
-        this.user.logout();
-        this.$router.push("/login");
-      }
-    });
-  },
   methods: {
     selectPhoto() {
       this.$refs.product_photo.click();
@@ -147,7 +139,7 @@ export default {
         .catch((error) => {
           this.Toast.fire({
             icon: "error",
-            title: "Error!",
+            title: error.response.data.message,
           });
           this.errors = error.response.data.errors;
         });
