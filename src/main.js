@@ -15,6 +15,9 @@ Vue.use(VueAxios, axios)
 // Laravel Pagination
 Vue.component('pagination', require('laravel-vue-pagination'));
 
+// Vue Moment
+Vue.use(require('vue-moment'));
+
 // SweetAlert Toast
 const Toast = Swal.mixin({
   toast: true,
@@ -27,7 +30,6 @@ const Toast = Swal.mixin({
       toast.addEventListener('mouseleave', Swal.resumeTimer)
   }
 })
-
 
 // Mixins
 Vue.mixin({

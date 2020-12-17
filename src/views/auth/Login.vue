@@ -3,7 +3,8 @@
     <div class="row">
       <div class="col-md-3"></div>
       <div class="col-md-6">
-        <div class="card text-white bg-dark mb-3 mt-5">
+        <h3 class="text-center mt-4">Products CRUD</h3>
+        <div class="card text-white bg-dark mb-5 mt-4">
           <h4 class="card-header text-center">Sign In</h4>
           <div class="card-body">
             <form @submit.prevent="login">
@@ -20,15 +21,21 @@
                   errors.email[0]
                 }}</span>
               </div>
-              <div class="mb-3">
+              <div class="mb-3" style="position: relative">
                 <label class="form-label">Password</label>
                 <input
-                  type="password"
+                  :type="passwordType"
                   class="form-control"
                   name="password"
                   placeholder="Password"
                   v-model="form.password"
                 />
+                <span
+                  class="showPassword"
+                  @mousedown="passwordType = 'text'"
+                  @mouseup="passwordType = 'password'"
+                  ><i class="fas fa-eye"></i
+                ></span>
                 <span class="text-danger" v-if="errors.password">{{
                   errors.password[0]
                 }}</span>
@@ -41,7 +48,15 @@
                   <router-link to="/register">Sign Up</router-link></label
                 >
               </div>
-              <button type="submit" class="btn btn-primary">Login</button>
+              <button type="submit" class="btn btn-primary" :disabled="loading">
+                <span
+                  v-if="loading"
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                Login
+              </button>
             </form>
           </div>
         </div>
@@ -58,18 +73,22 @@ import axios from "axios";
 export default {
   data() {
     return {
+      loading: false,
       form: {
         email: null,
         password: null,
       },
       errors: {},
+      passwordType: "password",
     };
   },
   methods: {
     login() {
+      this.loading = true;
       axios
         .post(this.url.make("api/auth/login"), this.form)
         .then((response) => {
+          this.loading = false;
           this.user.responseAfterLogin(response);
           this.Toast.fire({
             icon: "success",
@@ -78,6 +97,7 @@ export default {
           this.$router.push("/");
         })
         .catch((error) => {
+          this.loading = false;
           this.errors = error.response.data.errors;
 
           this.Toast.fire({
@@ -89,3 +109,13 @@ export default {
   },
 };
 </script>
+
+<style>
+.showPassword {
+  position: absolute;
+  top: 40px;
+  right: 15px;
+  color: black;
+  cursor: pointer;
+}
+</style>

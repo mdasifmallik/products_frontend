@@ -43,8 +43,9 @@
           </ul>
           <div class="btn-group">
             <button
+              style="color: white"
               type="button"
-              class="btn btn-secondary dropdown-toggle"
+              class="btn btn-outline-secondary dropdown-toggle"
               data-bs-toggle="dropdown"
               data-bs-display="static"
               aria-expanded="false"
@@ -54,7 +55,7 @@
             <ul class="dropdown-menu dropdown-menu-lg-end dropdown-menu-dark">
               <li>
                 <button class="dropdown-item" type="button" @click="logout">
-                  Log Out
+                  <i class="fas fa-sign-out-alt"></i> Log Out
                 </button>
               </li>
             </ul>
@@ -63,7 +64,7 @@
       </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container mt-4 mb-5">
       <router-view />
     </div>
   </div>
@@ -97,4 +98,7 @@ export default {
 </script>
 
 <style>
+a {
+  text-decoration: none;
+}
 </style>

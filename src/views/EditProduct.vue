@@ -17,6 +17,7 @@
             <label class="col-sm-2 col-form-label">Image</label>
             <div class="col-sm-10">
               <img
+                class="border border-success rounded"
                 v-show="!photoPreview"
                 v-if="form.image"
                 :src="url.make('uploads/product_photos/' + form.image)"
@@ -24,6 +25,7 @@
                 width="200px"
               />
               <img
+                class="border border-success rounded"
                 v-show="photoPreview"
                 :src="photoPreview"
                 alt=""
@@ -37,11 +39,11 @@
                 @change="changePhoto"
               />
               <button
-                class="btn btn-info"
+                class="btn btn-success"
                 style="margin-left: 10px"
                 @click.prevent="selectPhoto"
               >
-                Choose Photo
+                <i class="fas fa-images"></i> Change Photo
               </button>
               <span class="text-danger" v-if="errors.image">{{
                 errors.image[0]
@@ -51,7 +53,14 @@
           <div class="row mb-3">
             <label class="col-sm-2 col-form-label">Title</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" v-model="form.title" />
+              <input
+                type="text"
+                :class="{
+                  'form-control': true,
+                  'border-danger': errors.title,
+                }"
+                v-model="form.title"
+              />
               <span class="text-danger" v-if="errors.title">{{
                 errors.title[0]
               }}</span>
@@ -60,7 +69,14 @@
           <div class="row mb-3">
             <label class="col-sm-2 col-form-label">Price</label>
             <div class="col-sm-10">
-              <input type="number" class="form-control" v-model="form.price" />
+              <input
+                type="number"
+                :class="{
+                  'form-control': true,
+                  'border-danger': errors.price,
+                }"
+                v-model="form.price"
+              />
               <span class="text-danger" v-if="errors.price">{{
                 errors.price[0]
               }}</span>
@@ -70,7 +86,10 @@
             <label class="col-sm-2 col-form-label">Description</label>
             <div class="col-sm-10">
               <textarea
-                class="form-control"
+                :class="{
+                  'form-control': true,
+                  'border-danger': errors.description,
+                }"
                 rows="5"
                 v-model="form.description"
               ></textarea>
@@ -79,7 +98,15 @@
               }}</span>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary">Update</button>
+          <button type="submit" class="btn btn-primary" :disabled="loading">
+            <span
+              v-if="loading"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Update
+          </button>
         </form>
       </div>
     </div>
@@ -90,6 +117,7 @@
 export default {
   data() {
     return {
+      loading: false,
       form: Object,
       errors: Object,
       photoPreview: null,
@@ -126,6 +154,7 @@ export default {
         });
     },
     updateProduct() {
+      this.loading = true;
       // Making of the form
       let formData = new FormData();
       formData.append("_method", "PUT");
@@ -149,12 +178,16 @@ export default {
           }
         )
         .then(() => {
+          this.loading = false;
+
           this.Toast.fire({
             icon: "success",
             title: "Product updated successfully!",
           });
         })
         .catch((error) => {
+          this.loading = false;
+
           this.Toast.fire({
             icon: "error",
             title: error.response.data.message,

@@ -15,12 +15,14 @@
             <label class="col-sm-2 col-form-label">Image</label>
             <div class="col-sm-10">
               <img
+                class="border border-success rounded"
                 v-show="!photoPreview"
                 :src="url.make('uploads/product_photos/default.jpg')"
                 alt=""
                 width="200px"
               />
               <img
+                class="border border-success rounded"
                 v-show="photoPreview"
                 :src="photoPreview"
                 alt=""
@@ -34,11 +36,11 @@
                 @change="changePhoto"
               />
               <button
-                class="btn btn-info"
+                class="btn btn-success"
                 style="margin-left: 10px"
                 @click.prevent="selectPhoto"
               >
-                Choose Photo
+                <i class="fas fa-images"></i> Choose Photo
               </button>
               <span class="text-danger" v-if="errors.image">{{
                 errors.image[0]
@@ -48,7 +50,14 @@
           <div class="row mb-3">
             <label class="col-sm-2 col-form-label">Title</label>
             <div class="col-sm-10">
-              <input type="text" class="form-control" v-model="form.title" />
+              <input
+                type="text"
+                :class="{
+                  'form-control': true,
+                  'border-danger': errors.title,
+                }"
+                v-model="form.title"
+              />
               <span class="text-danger" v-if="errors.title">{{
                 errors.title[0]
               }}</span>
@@ -57,7 +66,14 @@
           <div class="row mb-3">
             <label class="col-sm-2 col-form-label">Price</label>
             <div class="col-sm-10">
-              <input type="number" class="form-control" v-model="form.price" />
+              <input
+                type="number"
+                :class="{
+                  'form-control': true,
+                  'border-danger': errors.price,
+                }"
+                v-model="form.price"
+              />
               <span class="text-danger" v-if="errors.price">{{
                 errors.price[0]
               }}</span>
@@ -67,7 +83,10 @@
             <label class="col-sm-2 col-form-label">Description</label>
             <div class="col-sm-10">
               <textarea
-                class="form-control"
+                :class="{
+                  'form-control': true,
+                  'border-danger': errors.description,
+                }"
                 rows="5"
                 v-model="form.description"
               ></textarea>
@@ -76,7 +95,15 @@
               }}</span>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary">Add</button>
+          <button type="submit" class="btn btn-primary" :disabled="loading">
+            <span
+              v-if="loading"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            Add
+          </button>
         </form>
       </div>
     </div>
@@ -87,6 +114,7 @@
 export default {
   data() {
     return {
+      loading: false,
       form: {
         title: null,
         description: null,
@@ -110,6 +138,7 @@ export default {
       reader.readAsDataURL(this.$refs.product_photo.files[0]);
     },
     addProduct() {
+      this.loading = true;
       // Making of the form
       let formData = new FormData();
       Object.keys(this.form).map((e) => {
@@ -130,6 +159,7 @@ export default {
           },
         })
         .then(() => {
+          this.loading = false;
           this.Toast.fire({
             icon: "success",
             title: "New product added successfully!",
@@ -137,6 +167,7 @@ export default {
           this.$router.push("/");
         })
         .catch((error) => {
+          this.loading = false;
           this.Toast.fire({
             icon: "error",
             title: error.response.data.message,
