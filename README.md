@@ -1,4 +1,5 @@
 # products_frontend
+Please set up & run [Products Backend](https://github.com/mdasifmallik/products_backend) first, to successfully run this application.
 
 ## Project setup
 ```
