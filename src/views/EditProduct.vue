@@ -179,6 +179,8 @@ export default {
         )
         .then(() => {
           this.loading = false;
+          this.errors = null;
+          this.errors = Object;
 
           this.Toast.fire({
             icon: "success",
