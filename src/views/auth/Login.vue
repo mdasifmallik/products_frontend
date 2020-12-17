@@ -98,7 +98,9 @@ export default {
         })
         .catch((error) => {
           this.loading = false;
-          this.errors = error.response.data.errors;
+          if (error.response.data.errors) {
+            this.errors = error.response.data.errors;
+          }
 
           this.Toast.fire({
             icon: "error",
